@@ -7,4 +7,6 @@
 <pre>php artisan && migrate:fresh && php artisan db:seed && php artisan app:update-or-fill-news</pre>
 6. You're all set. Enjoy **:D**
 
-   Authentication: Jwt 
+   Authentication: Jwt
+   
+   APIs: [NewsApi, NYT, Guardian]
