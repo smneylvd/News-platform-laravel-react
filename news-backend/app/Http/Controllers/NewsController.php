@@ -11,7 +11,7 @@ class NewsController extends Controller
 {
     public function getAllNews()
     {
-        return response()->json(News::inRandomOrder()->get());
+        return response()->json(News::all());
     }
 
     public function filterNews(Request $request)
@@ -28,24 +28,24 @@ class NewsController extends Controller
             return response($validator->errors()->first(), 400);
         }
 
-        $categoryIds = $request->filled('category') ? explode(",", $request->category) : null;
         $keywords = $request->filled('q') ? explode(" ", $request->q) : null;
+        $categoryIds = $request->filled('category') ? explode(",", $request->category) : null;
         $startDate = $request->filled('date_from') ? Carbon::parse($request->date_from) : null;
         $endDate = $request->filled('date_to') ? Carbon::parse($request->date_to) : null;
         $sourceIds = $request->filled('source') ? explode(",", $request->source) : null;
 
-        $filteredNews = News::when($categoryIds, function ($query) use ($categoryIds) {
-            $query->whereHas('category', function ($q) use ($categoryIds) {
-                $q->whereIn('id', $categoryIds);
+        $filteredNews = News::when($keywords, function ($query) use ($keywords) {
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $keyword) {
+                    $q->orWhereHas('keywords', function ($innerQ) use ($keyword) {
+                        $innerQ->where('name', 'LIKE', '%' . $keyword . '%');
+                    });
+                }
             });
         })
-            ->when($keywords, function ($query) use ($keywords) {
-                $query->where(function ($q) use ($keywords) {
-                    foreach ($keywords as $keyword) {
-                        $q->orWhereHas('keywords', function ($innerQ) use ($keyword) {
-                            $innerQ->where('name', 'LIKE', '%' . $keyword . '%');
-                        });
-                    }
+            ->when($categoryIds, function ($query) use ($categoryIds) {
+                $query->whereHas('category', function ($q) use ($categoryIds) {
+                    $q->whereIn('id', $categoryIds);
                 });
             })
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {

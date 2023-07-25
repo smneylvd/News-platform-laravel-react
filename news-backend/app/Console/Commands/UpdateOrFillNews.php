@@ -87,7 +87,7 @@ class UpdateOrFillNews extends Command
 
             // Array of the most important keywords sliced to 5 elements,
             // so each article will has at most 5 keywords
-            $keywords = array_slice($textRankFacade->getOnlyKeyWords($text), 0, 5);
+            $keywords = $textRankFacade->getOnlyKeyWords($text);
 
             foreach ($keywords as $keyword => $val) {
 

@@ -1,0 +1,5 @@
+news-backend/node_modules
+news-backend/build
+.dockerignore
+news-backend/Dockerfile
+news-backend/Dockerfile.prod

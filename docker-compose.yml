@@ -1,9 +1,9 @@
-version: '3'
+version: '3.9'
 services:
-    laravel.test:
+
+    backend:
         build:
-            context: ./vendor/laravel/sail/runtimes/8.2
-            dockerfile: Dockerfile
+            dockerfile: /news-backend/vendor/laravel/sail/runtimes/8.2/Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
         image: sail-8.2/app
@@ -19,7 +19,7 @@ services:
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
-            - '.:/var/www/html'
+            - './news-backend:/var/www/html'
         networks:
             - sail
         depends_on:
@@ -38,7 +38,6 @@ services:
             MYSQL_ALLOW_EMPTY_PASSWORD: 1
         volumes:
             - 'sail-mysql:/var/lib/mysql'
-            - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
         networks:
             - sail
         healthcheck:
@@ -64,6 +63,24 @@ services:
                 - ping
             retries: 3
             timeout: 5s
+    frontend:
+        build:
+            context: ./news-frontend
+        volumes:
+            - './news-frontend:/app/'
+            - '/app/node_modules'
+        ports:
+            - "3000:3000"
+            - "9229:9229"
+        networks:
+            - sail
+        command:
+            - npx
+            - nodemon
+            - start
+        depends_on:
+            - backend
+
 networks:
     sail:
         driver: bridge

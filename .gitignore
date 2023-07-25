@@ -1,3 +1,7 @@
-
 .idea/
 vendor/
+node_modules/
+public/
+storage/
+/news-frontend/node_modules/
+/news-frontend/public/

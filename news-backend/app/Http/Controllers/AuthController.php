@@ -26,9 +26,10 @@ class AuthController extends Controller
     public function register()
     {
         $validator = Validator::make(request()->all(), [
-            'email' => 'unique:users',
+            'email' => 'unique:users|email',
             'name' => 'required',
-            'password' => 'required|string|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'
+            'password' => 'required|string|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
+            'repassword' => 'required|same:password'
         ]);
 
         if ($validator->fails()) {
@@ -57,7 +58,7 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
 
         if (!$token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Incorrect email or password'], 401);
         }
 
         return $this->respondWithToken($token);
